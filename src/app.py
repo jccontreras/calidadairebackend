@@ -1,5 +1,3 @@
-import decimal
-
 import arrow
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -22,9 +20,6 @@ class Particles(db.Model):
 
     def __init__(self, name):
         self.name = name
-
-
-# db.create_all()
 
 
 class ParticleSchema(ma.Schema):
@@ -94,9 +89,6 @@ class Devices(db.Model):
         self.name = name
         self.geo = geo
         self.altitude = altitude
-
-
-# db.create_all()
 
 
 class DeviceSchema(ma.Schema):
@@ -185,9 +177,6 @@ class QualityData(db.Model):
         self.temp = temp
         self.rh = rh
         self.date = date
-
-
-# db.create_all()
 
 
 class QualityDataSchema(ma.Schema):
