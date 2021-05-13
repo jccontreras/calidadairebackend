@@ -10,7 +10,6 @@ app = Flask('__flask__')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-
 # Particles API 's
 class Particles(db.Model):
     __tablename__ = 'PARTICLES'
