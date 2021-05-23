@@ -7,8 +7,8 @@ import arrow
 app = Flask('__flask__')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-PORT= 5000
-DEBUG= False
+PORT = 5000
+DEBUG = False
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -23,6 +23,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     }
 )
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
 
 # Particles API 's
 class Particles(db.Model):
@@ -400,4 +401,4 @@ def delete_log_record(id):
 
 
 if __name__ == '__main__':
-    app.run(port= PORT, debug= DEBUG)
+    app.run(port=PORT, debug=DEBUG)
