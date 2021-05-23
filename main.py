@@ -14,7 +14,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 SWAGGER_URL = '/documentation'
-app_URL = '/static/swagger.yaml'
+app_URL = 'swagger.yaml'
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     app_URL,
