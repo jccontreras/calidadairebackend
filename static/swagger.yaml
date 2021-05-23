@@ -1,0 +1,615 @@
+openapi: 3.0.0
+info:
+  description: API's para al proyecto de Calidad del aire realizadas por Natalia Argote y Juan Camilo Contreras Chacon.
+  version: 1.0.0
+  title: Calidad del aire API's REST Python Flask - UEB
+  contact:
+    email: jccontreras@unbosque.edu.co
+    url: 'https://jccontreras.com'
+servers:
+  - url: /calidadaire
+tags:
+ - name: Devices
+   description: Maneja toda la información relacionada con los dispositivos.
+ - name: Quality Data
+   description: Maneja toda la información administrada por los dispositivos calidad del aire.
+ - name: Particles
+   description: Maneja toda la información relacionada con los tipos de partículas.
+ - name: Log Quality Data
+   description: Maneja toda la información erronea administrada por los dispositivos calidad del aire.
+paths:
+  /device:
+    post:
+      tags:
+        - Devices
+      summary: Registra un nuevo dispositivo en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deviceBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El dispositivo se registró correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deviceBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Devices
+      summary: Obtiene los dispositivos de la BD.
+      responses:
+        200:
+          description: (ok) Lista de todos los dispositivos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deviceBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+  /device/{iddevice}:
+    get:
+      tags:
+        - Devices
+      summary: Obtiene un dispositivo de la BD.
+      parameters:
+        - name: iddevice
+          in: path
+          description: Identificador del dispositivo
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Descripción del dispositivo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deviceBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Devices
+      summary: Actualiza un dispositivo en la BD.
+      parameters:
+        - name: iddevice
+          in: path
+          description: Identificador del dispositivo
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deviceBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El dispositivo se actualizó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deviceBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Devices
+      summary: Elimina un dispositivo en la BD.
+      parameters:
+        - name: iddevice
+          in: path
+          description: Identificador del dispositivo
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) El dispositivo se eliminó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deviceBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+  /qualitydata:
+    post:
+      tags:
+        - Quality Data
+      summary: Registra los datos de los dispositivos calidad del aire en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qualityBody'
+        required: true
+      responses:
+        200:
+          description: (ok) Los datos se registrarón correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Quality Data
+      summary: Obtiene los datos brindados por los dispositivos calidad del aire en la BD.
+      responses:
+        200:
+          description: (ok) Lista de toda la información brindada por los dispositivos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /qualitydata/{iddata}:
+    get:
+      tags:
+        - Quality Data
+      summary: Obtiene un registro de los datos capturados por los dispositivos de la BD.
+      parameters:
+        - name: iddata
+          in: path
+          description: Identificador del registro
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Descripción del registro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Quality Data
+      summary: Actualiza un registro de los datos capturados por los dispositivos de la BD.
+      parameters:
+        - name: iddata
+          in: path
+          description: Identificador del registro
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qualityBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El regsitro se actualizó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Quality Data
+      summary: Elimina un registro de los datos capturados por los dispositivos de la BD.
+      parameters:
+        - name: iddata
+          in: path
+          description: Identificador del regsitro
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) El registro se eliminó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+  /qualitydata/selectbydevice/{iddevice}:
+    get:
+      tags:
+        - Quality Data
+      summary: Obtiene los registros de calidad de aire asociados a un dispositivo especifico de la BD.
+      parameters:
+        - name: iddevice
+          in: path
+          description: Identificador del dispositivo
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Lista de registros asociados a un dispositivo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /particles:
+    post:
+      tags:
+        - Particles
+      summary: Registra las partículas en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qualityBody'
+        required: true
+      responses:
+        200:
+          description: (ok) La partícula registrarón correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Particles
+      summary: Obtiene las partículas en la BD.
+      responses:
+        200:
+          description: (ok) Lista de las partículas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /particle/{idpart}:
+    get:
+      tags:
+        - Particles
+      summary: Obtiene una partícula de la BD.
+      parameters:
+        - name: idpart
+          in: path
+          description: Identificador de la partícula
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Descripción del registro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Particles
+      summary: Actualiza una partícula de la BD.
+      parameters:
+        - name: idpart
+          in: path
+          description: Identificador de la partícula
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/particleBody'
+        required: true
+      responses:
+        200:
+          description: (ok) La partícula se actualizó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Particles
+      summary: Elimina una partícula de la BD.
+      parameters:
+        - name: idpart
+          in: path
+          description: Identificador de la partícula
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) La partícula se eliminó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /logqualitydata:
+    post:
+      tags:
+        - Log Quality Data
+      summary: Registra los datos erroneos de los dispositivos calidad del aire en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qualityBody'
+        required: true
+      responses:
+        200:
+          description: (ok) Los datos se registrarón correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Log Quality Data
+      summary: Obtiene los datos erroneos brindados por los dispositivos calidad del aire en la BD.
+      responses:
+        200:
+          description: (ok) Lista de toda la información brindada por los dispositivos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /logqualitydata/{iddata}:
+     get:
+       tags:
+         - Log Quality Data
+       summary: Obtiene un registro erroneos de los datos capturados por los dispositivos de la BD.
+       parameters:
+         - name: iddata
+           in: path
+           description: Identificador del registro
+           required: true
+           schema:
+             type: integer
+       responses:
+         200:
+           description: (ok) Descripción del registro
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/qualityBody'
+         400:
+           $ref: '#/components/responses/BadRequest'
+         404:
+           $ref: '#/components/responses/NotFound'
+         500:
+           $ref: '#/components/responses/ServerError'
+
+     put:
+        tags:
+          - Log Quality Data
+        summary: Actualiza un registro erroneos de los datos capturados por los dispositivos de la BD.
+        parameters:
+          - name: iddata
+            in: path
+            description: Identificador del registro
+            required: true
+            schema:
+              type: integer
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+          required: true
+        responses:
+          200:
+            description: (ok) El regsitro se actualizó correctamente.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/qualityBody'
+
+          400:
+            $ref: '#/components/responses/BadRequest'
+          404:
+            $ref: '#/components/responses/NotFound'
+          500:
+            $ref: '#/components/responses/ServerError'
+
+     delete:
+        tags:
+          - Log Quality Data
+        summary: Elimina un registro erroneos de los datos capturados por los dispositivos de la BD.
+        parameters:
+          - name: iddata
+            in: path
+            description: Identificador del regsitro
+            required: true
+            schema:
+              type: integer
+        responses:
+          200:
+            description: (ok) El registro se eliminó correctamente.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/qualityBody'
+
+          400:
+            $ref: '#/components/responses/BadRequest'
+          404:
+            $ref: '#/components/responses/NotFound'
+          500:
+            $ref: '#/components/responses/ServerError'
+components:
+  responses:
+    NotFound:
+      description: (NotFound) No se encontró el microservicio.
+    BadRequest:
+      description: (BadRequest) Los datos enviados son incorrectos o no se envia algún dato obligatorio.
+    ServerError:
+      description: (ServerError) error en el servidor.
+
+  schemas:
+    deviceBody:
+      type: object
+      properties:
+        name:
+          type: string
+        geo:
+          type: string
+        altitude:
+          type: integer
+
+    qualityBody:
+      type: object
+      properties:
+        device:
+          type: integer
+        pressure:
+          type: integer
+        id_particle1:
+          type: integer
+        value_particle1:
+          type: integer
+        id_particle2:
+          type: integer
+        value_particle2:
+          type: integer
+        temp:
+          type: integer
+        rh:
+          type: integer
+        date:
+          type: string
+
+    particleBody:
+      type: object
+      properties:
+        name:
+          type: string

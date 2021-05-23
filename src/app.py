@@ -2,6 +2,7 @@ import arrow
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask('__flask__')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
@@ -9,6 +10,17 @@ app = Flask('__flask__')
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
+SWAGGER_URL = '/documentation'
+app_URL = '/static/swagger.yaml'
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    app_URL,
+    config={
+        'app_name': "Calidad del aire Back-end - UEB"
+    }
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # Particles API 's
 class Particles(db.Model):
@@ -111,7 +123,7 @@ def create_device():
     return device_schema.jsonify(new_device)
 
 
-@app.route('/calidadaire/devices', methods=['GET'])
+@app.route('/calidadaire/device', methods=['GET'])
 def get_devices():
     all_devices = Devices.query.all()
     result = devices_schema.dump(all_devices)
