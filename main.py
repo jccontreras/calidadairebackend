@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -14,7 +14,8 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 SWAGGER_URL = '/documentation'
-app_URL = '/static/swagger.yaml'
+# app_URL = '/static/swagger.yaml'
+app_URL = {{url_for('static', filename='swagger.yaml')}}
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     app_URL,
