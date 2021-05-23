@@ -1,1 +1,1 @@
-worker python src/app.py
+web: flask src/app.py

@@ -1,4 +1,4 @@
-import arrow
+from arrow import arrow
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -7,6 +7,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 app = Flask('__flask__')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+PORT= 5000
+DEBUG= False
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -398,4 +400,4 @@ def delete_log_record(id):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port= PORT, debug= DEBUG)
