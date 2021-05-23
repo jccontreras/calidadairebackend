@@ -581,6 +581,7 @@ components:
       properties:
         name:
           type: string
+          description: No pueden haber 2 nombres iguales.
         geo:
           type: string
         altitude:
