@@ -167,6 +167,32 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
+  /login:
+    post:
+      tags:
+        - Users
+      summary: Verifica Login en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El usuario se logueo correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
   /users:
     get:
       tags:
@@ -796,6 +822,14 @@ components:
         id:
           type: string
         name:
+          type: string
+
+    loginBody:
+      type: object
+      properties:
+        id:
+          type: string
+        psw:
           type: string
 
     usersBody:

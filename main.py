@@ -7,12 +7,14 @@ from flask_swagger_ui import get_swaggerui_blueprint
 import arrow
 from datetime import date
 from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 app = Flask('__flask__')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 PORT = 5000
 DEBUG = False
+app.secret_key = 'my_secret_key'
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -199,14 +201,16 @@ class User(db.Model):
         self.email = email
         self.cel = cel
         self.type = type
-        self.psw = generate_psw(psw)
+        self.psw = self.__generate_psw(psw)
         self.device = device
         self.bdate = bdate
         self.edate = edate
 
+    def verify_psw(self, psw):
+        return check_password_hash(self.psw, psw)
 
-def generate_psw(psw):
-    return generate_password_hash(psw)
+    def __generate_psw(self, psw):
+        return generate_password_hash(psw)
 
 
 class UserSchema(ma.Schema):
@@ -237,6 +241,19 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     return user_schema.jsonify(new_user)
+
+
+@app.route('/calidadaire/login', methods=['POST'])
+def login_user():
+    id = request.json['id']
+    psw = request.json['psw']
+
+    user = User.query.filter_by(id=id).first()
+
+    if user is not None and user.verify_psw(psw):
+        return jsonify(True)
+    else:
+        return jsonify(False)
 
 
 @app.route('/calidadaire/users', methods=['GET'])
