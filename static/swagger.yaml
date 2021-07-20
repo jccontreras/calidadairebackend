@@ -9,6 +9,12 @@ info:
 servers:
   - url: /calidadaire
 tags:
+ - name: User Types
+   description: Maneja toda la parametrización relacionada con los Tipos de usuario.
+ - name: Document Types
+   description: Maneja toda la parametrización relacionada con los Tipos de documentos.
+ - name: Users
+   description: Maneja toda la información relacionada con los usuarios.
  - name: Devices
    description: Maneja toda la información relacionada con los dispositivos.
  - name: Quality Data
@@ -17,7 +23,170 @@ tags:
    description: Maneja toda la información relacionada con los tipos de partículas.
  - name: Log Quality Data
    description: Maneja toda la información erronea administrada por los dispositivos calidad del aire.
+
 paths:
+  /usertypes:
+    post:
+      tags:
+        - User Types
+      summary: Registra un nuevo tipo de usuario en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userTypesBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El Tipo de usuario se registró correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userTypesBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - User Types
+      summary: Obtiene los tipos de usuario de la BD.
+      responses:
+        200:
+          description: (ok) Lista de todos los tipos de usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userTypesBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /usertypes/{idusertype}:
+    get:
+      tags:
+        - User Types
+      summary: Obtiene un registro de los tipos de usuario de la BD.
+      parameters:
+        - name: idusertype
+          in: path
+          description: Identificador del registro
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Descripción del registro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userTypesBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /doctypes:
+    post:
+      tags:
+        - Document Types
+      summary: Registra un nuevo tipo de documento en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/docTypesBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El Tipo de usuario se registró correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/docTypesBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags:
+        - Document Types
+      summary: Obtiene los tipos de documento de la BD.
+      responses:
+        200:
+          description: (ok) Lista de todos los tipos de documento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/docTypesBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /signup:
+    post:
+      tags:
+        - Users
+      summary: Registra un nuevo usuario en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usersBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El usuario se registró correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Obtiene los usuarios de la BD.
+      responses:
+        200:
+          description: (ok) Lista de todos los tipos de documento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
   /device:
     post:
       tags:
@@ -62,7 +231,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/ServerError'
-
 
   /device/{iddevice}:
     get:
@@ -608,9 +776,49 @@ components:
           type: integer
         date:
           type: string
+          description: Debe estar en formato YYYY-MM-DD HH mm ss
 
     particleBody:
       type: object
       properties:
         name:
           type: string
+
+    userTypesBody:
+      type: object
+      properties:
+        name:
+          type: string
+
+    docTypesBody:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    usersBody:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Es el número de identificación de la persona.
+        idtype:
+          type: string
+          description: Es el tipo de identificación de la persona.
+        name:
+          type: string
+        email:
+          type: string
+        cel:
+          type: string
+        type:
+          type: integer
+        psw:
+          type: string
+        device:
+          type: integer
+        bdate:
+          type: string
+          description: Debe estar en formato YYYY-MM-DD
