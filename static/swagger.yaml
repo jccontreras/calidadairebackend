@@ -171,7 +171,7 @@ paths:
     post:
       tags:
         - Users
-      summary: Verifica Login en la BD.
+      summary: Inicia sesión con datos de la BD.
       requestBody:
         content:
           application/json:
@@ -185,6 +185,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/loginBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /logout:
+    get:
+      tags:
+        - Users
+      summary: Finaliza la sesión.
+      responses:
+        200:
+          description: (ok) Finalizó la sesión correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
 
         400:
           $ref: '#/components/responses/BadRequest'

@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask import session
 import arrow
 from datetime import date
 from werkzeug.security import generate_password_hash
@@ -53,12 +54,16 @@ usertypes_schema = UserTypesSchema(many=True)
 
 @app.route('/calidadaire/usertypes', methods=['POST'])
 def create_usertypes():
-    name = request.json['name']
-    new_usertype = UserTypes(name)
-    db.session.add(new_usertype)
-    db.session.commit()
-
-    return usertype_schema.jsonify(new_usertype)
+    if 'userid' in session:
+        name = request.json['name']
+        new_usertype = UserTypes(name)
+        db.session.add(new_usertype)
+        db.session.commit()
+        return usertype_schema.jsonify(new_usertype)
+    else:
+        response = jsonify({'message': 'Debe iniciar sesión.'})
+        response.status_code = 400
+        return response
 
 
 @app.route('/calidadaire/usertypes', methods=['GET'])
@@ -253,9 +258,25 @@ def login_user():
 
     if user is not None and user.verify_psw(psw):
         user.psw = ''
+        session['userid'] = user.id
         return user_schema.jsonify(user)
     else:
-        return jsonify('Usuario o contraseña invalidos')
+        response = jsonify({'message': 'Usuario o contraseña invalidos.'})
+        response.status_code = 400
+        return response
+
+
+@app.route('/calidadaire/logout', methods=['GET'])
+def log_out():
+    if 'userid' in session:
+        session.pop('userid', None)
+        response = jsonify({'message' : 'Ha finalizado sesión correctamente.'})
+        response.status_code = 200
+        return response
+    else:
+        response = jsonify({'message': 'Ya ha cerrado sesión correctamente'})
+        response.status_code = 400
+        return response
 
 
 @app.route('/calidadaire/users', methods=['GET'])
