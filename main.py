@@ -440,7 +440,7 @@ def get_record(id):
 
 @app.route('/calidadaire/qualitydata/selectbydevice/<device>', methods=['GET'])
 def get_record_by_device(device):
-    records = QualityData.query.get(device)
+    records = QualityData.query.filter_by(device=device)
     result = quality_data_schema.dump(records)
     return jsonify(result)
 
