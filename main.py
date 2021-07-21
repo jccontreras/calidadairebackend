@@ -15,7 +15,7 @@ app = Flask('__flask__')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 PORT = 5000
 DEBUG = False
-app.secret_key = 'my_secret_key'
+app.secret_key = '5HnNaFgcBVNxkUswJ74eImPJQuXSvecr'
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
