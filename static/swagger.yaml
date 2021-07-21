@@ -213,6 +213,34 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
+
+  /users/{iduser}:
+    get:
+      tags:
+        - Users
+      summary: Obtiene un usuario de la BD.
+      parameters:
+        - name: iduser
+          in: path
+          description: Identificación del usuario
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: (ok) Descripción del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
   /device:
     post:
       tags:

@@ -240,6 +240,7 @@ def create_user():
 
     db.session.add(new_user)
     db.session.commit()
+    new_user.psw = ''
     return user_schema.jsonify(new_user)
 
 
@@ -251,9 +252,10 @@ def login_user():
     user = User.query.filter_by(id=id).first()
 
     if user is not None and user.verify_psw(psw):
-        return jsonify(True)
+        user.psw = ''
+        return user_schema.jsonify(user)
     else:
-        return jsonify(False)
+        return jsonify('Usuario o contraseña invalidos')
 
 
 @app.route('/calidadaire/users', methods=['GET'])
@@ -261,6 +263,13 @@ def get_users():
     all_user = User.query.all()
     result = users_schema.dump(all_user)
     return jsonify(result)
+
+
+@app.route('/calidadaire/users/<id>', methods=['GET'])
+def get_user(id):
+    user = User.query.get(id)
+    user.psw = ''
+    return user_schema.jsonify(user)
 
 
 # Devices API 's
