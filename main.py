@@ -54,16 +54,11 @@ usertypes_schema = UserTypesSchema(many=True)
 
 @app.route('/calidadaire/usertypes', methods=['POST'])
 def create_usertypes():
-    if 'userid' in session:
-        name = request.json['name']
-        new_usertype = UserTypes(name)
-        db.session.add(new_usertype)
-        db.session.commit()
-        return usertype_schema.jsonify(new_usertype)
-    else:
-        response = jsonify({'message': 'Debe iniciar sesión.'})
-        response.status_code = 400
-        return response
+    name = request.json['name']
+    new_usertype = UserTypes(name)
+    db.session.add(new_usertype)
+    db.session.commit()
+    return usertype_schema.jsonify(new_usertype)
 
 
 @app.route('/calidadaire/usertypes', methods=['GET'])
@@ -270,7 +265,7 @@ def login_user():
 def log_out():
     if 'userid' in session:
         session.pop('userid', None)
-        response = jsonify({'message' : 'Ha finalizado sesión correctamente.'})
+        response = jsonify({'message': 'Ha finalizado sesión correctamente.'})
         response.status_code = 200
         return response
     else:
@@ -291,6 +286,13 @@ def get_user(id):
     user = User.query.get(id)
     user.psw = ''
     return user_schema.jsonify(user)
+
+
+@app.route('/calidadaire/users/selectbydevice/<type>', methods=['GET'])
+def get_user_by_type(type):
+    records = User.query.filter_by(type=type)
+    result = users_schema.dump(records)
+    return jsonify(result)
 
 
 # Devices API 's
@@ -560,8 +562,8 @@ def get_log_record(id):
 
 @app.route('/calidadaire/logqualitydata/selectbydevice/<device>', methods=['GET'])
 def get_log_record_by_device(device):
-    logrecords = LogQualityData.query.get(device)
-    result = log_quality_data_schema.dump(logrecords)
+    records = LogQualityData.query.filter_by(device=device)
+    result = log_quality_data_schema.dump(records)
     return jsonify(result)
 
 

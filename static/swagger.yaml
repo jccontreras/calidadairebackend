@@ -171,7 +171,7 @@ paths:
     post:
       tags:
         - Users
-      summary: Inicia sesión con datos de la BD.
+      summary: Inicia sesión con datos de la BD. (Activa session en cookies de cliente llamada 'userid')
       requestBody:
         content:
           application/json:
@@ -184,7 +184,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/loginBody'
+                $ref: '#/components/schemas/usersBody'
 
         400:
           $ref: '#/components/responses/BadRequest'
@@ -197,14 +197,10 @@ paths:
     get:
       tags:
         - Users
-      summary: Finaliza la sesión.
+      summary: Finaliza la sesión. (Finaliza session en cookies de cliente llamada 'userid')
       responses:
         200:
           description: (ok) Finalizó la sesión correctamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/usersBody'
 
         400:
           $ref: '#/components/responses/BadRequest'
@@ -249,6 +245,33 @@ paths:
       responses:
         200:
           description: (ok) Descripción del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /users/selectbydevice/{type}:
+    get:
+      tags:
+        - Users
+      summary: Obtiene un usuario de la BD.
+      parameters:
+        - name: type
+          in: path
+          description: Tipo de usuario
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Lista de usuarios seleccionados por tipo.
           content:
             application/json:
               schema:
@@ -808,6 +831,34 @@ paths:
             $ref: '#/components/responses/NotFound'
           500:
             $ref: '#/components/responses/ServerError'
+
+  /logqualitydata/selectbydevice/{iddevice}:
+    get:
+      tags:
+        - Log Quality Data
+      summary: Obtiene los registros de log calidad de aire asociados a un dispositivo especifico de la BD.
+      parameters:
+        - name: iddevice
+          in: path
+          description: Identificador del dispositivo
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: (ok) Lista de registros log asociados a un dispositivo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
 components:
   responses:
     NotFound:
