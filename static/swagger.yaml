@@ -257,6 +257,71 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
+    delete:
+      tags:
+        - Users
+      summary: Elimina un usuario en la BD.
+      parameters:
+        - name: iduser
+          in: path
+          description: Identificación del usuario
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: (ok) El usuario se eliminó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /users/{iduser}/{state}:
+    put:
+      tags:
+        - Users
+      summary: Actualiza un usuario desde perfil de administrador o contraseña desde perfil del usuario en la BD.
+      parameters:
+        - name: iduser
+          in: path
+          description: Identificación del usuario.
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: path
+          description: state del update - 0 si es cambio de datos desde el administrador - 1 si es cambio de contraseña desde cada usuario.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usersBody'
+        required: true
+      responses:
+        200:
+          description: (ok) El usuario se actualizó correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
   /users/selectbydevice/{type}:
     get:
       tags:

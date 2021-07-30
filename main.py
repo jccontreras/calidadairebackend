@@ -201,7 +201,7 @@ class User(db.Model):
         self.email = email
         self.cel = cel
         self.type = type
-        self.psw = self.__generate_psw(psw)
+        self.psw = self.generate_psw(psw)
         self.device = device
         self.bdate = bdate
         self.edate = edate
@@ -209,7 +209,7 @@ class User(db.Model):
     def verify_psw(self, psw):
         return check_password_hash(self.psw, psw)
 
-    def __generate_psw(self, psw):
+    def generate_psw(self, psw):
         return generate_password_hash(psw)
 
 
@@ -288,11 +288,62 @@ def get_user(id):
     return user_schema.jsonify(user)
 
 
+@app.route('/calidadaire/users/<id>', methods=['DELETE'])
+def delete_user(id):
+    user = User.query.get(id)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    response = jsonify({'message': 'Usuario eliminado exitosamente.'})
+    response.status_code = 200
+    return response
+
+
 @app.route('/calidadaire/users/selectbydevice/<type>', methods=['GET'])
 def get_user_by_type(type):
     records = User.query.filter_by(type=type)
     result = users_schema.dump(records)
     return jsonify(result)
+
+
+@app.route('/calidadaire/users/<id>/<state>', methods=['PUT'])
+def update_user(id, state):
+    user = User.query.get(id)
+
+    if state == '0':
+        id = request.json['id']
+        idtype = request.json['idtype']
+        name = request.json['name']
+        email = request.json['email']
+        cel = request.json['cel']
+        type = request.json['type']
+        psw = request.json['psw']
+        device = request.json['device']
+        bdate = arrow.get(request.json['bdate']).format('YYYY-MM-DD')
+
+        user.id = id
+        user.idtype = idtype
+        user.name = name
+        user.email = email
+        user.cel = cel
+        user.type = type
+        user.psw = user.generate_psw(psw)
+        user.device = device
+        user.bdate = bdate
+
+        db.session.commit()
+        user.psw = ''
+
+        return user_schema.jsonify(user)
+    if state == '1':
+        psw = request.json['psw']
+        user.psw = user.generate_psw(psw)
+        db.session.commit()
+
+        response = jsonify({'message': 'Se ha cambiado la contraseña exitosamente.'})
+        response.status_code = 200
+        return response
 
 
 # Devices API 's
