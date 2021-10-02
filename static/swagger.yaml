@@ -638,6 +638,59 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
+  /qualitydata/selectbyuser/{userid}:
+    get:
+      tags:
+        - Quality Data
+      summary: Obtiene los registros de calidad de aire asociados a un usuario especifico de la BD.
+      parameters:
+        - name: userid
+          in: path
+          description: Identifición del usuario
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: (ok) Lista de registros asociados a un dispositivo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /qualitydata/datefilter:
+    post:
+      tags:
+        - Quality Data
+      summary: Obtiene los registros de calidad de aire asociados a una fecha especifica de la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/filterDateBody'
+        required: true
+      responses:
+        200:
+          description: (ok) Registros Obtenidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qualityBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
   /particles:
     post:
       tags:
@@ -1020,3 +1073,17 @@ components:
         bdate:
           type: string
           description: Debe estar en formato YYYY-MM-DD
+
+    filterDateBody:
+      type: object
+      properties:
+        year:
+          type: string
+        month:
+          type: string
+        day:
+          type: string
+        hour:
+          type: string
+        min:
+          type: string

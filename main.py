@@ -1,5 +1,3 @@
-import datetime
-
 from flask import Flask, request, jsonify, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -11,6 +9,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 app = Flask('__flask__')
+# Configuración para la conexión a la base de datos
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 PORT = 5000
@@ -20,6 +19,7 @@ app.secret_key = '5HnNaFgcBVNxkUswJ74eImPJQuXSvecr'
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
+#
 SWAGGER_URL = '/documentation'
 app_URL = '/static/swagger.yaml'
 swaggerui_blueprint = get_swaggerui_blueprint(
@@ -54,11 +54,16 @@ usertypes_schema = UserTypesSchema(many=True)
 
 @app.route('/calidadaire/usertypes', methods=['POST'])
 def create_usertypes():
-    name = request.json['name']
-    new_usertype = UserTypes(name)
-    db.session.add(new_usertype)
-    db.session.commit()
-    return usertype_schema.jsonify(new_usertype)
+    if 'userid' in session:
+        name = request.json['name']
+        new_usertype = UserTypes(name)
+        db.session.add(new_usertype)
+        db.session.commit()
+        return usertype_schema.jsonify(new_usertype)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 @app.route('/calidadaire/usertypes', methods=['GET'])
@@ -469,7 +474,7 @@ def create_record():
     value_particle2 = request.json['value_particle2']
     temp = request.json['temp']
     rh = request.json['rh']
-    date = arrow.get(request.json['date']).format('YYYY-MM-DD HH: mm: ss')
+    date = arrow.get(request.json['date']).format('YYYY-MM-DD HH:mm:ss')
     new_record = QualityData(device, pressure, id_particle1, value_particle1, id_particle2, value_particle2,
                              temp, rh, date)
 
@@ -496,6 +501,43 @@ def get_record_by_device(device):
     records = QualityData.query.filter_by(device=device)
     result = quality_data_schema.dump(records)
     return jsonify(result)
+
+
+@app.route('/calidadaire/qualitydata/selectbyuser/<userid>', methods=['GET'])
+def get_record_by_user(userid):
+    user = User.query.get(userid)
+    records = QualityData.query.filter_by(device=user.device)
+    result = quality_data_schema.dump(records)
+    return jsonify(result)
+
+
+@app.route('/calidadaire/qualitydata/datefilter', methods=['POST'])
+def get_record_by_date():
+    year = request.json['year']
+    month = request.json['month']
+    day = request.json['day']
+    hour = request.json['hour']
+    min = request.json['min']
+
+    date = ''
+    if year != '':
+        date = year
+    if month != '':
+        date += '-' + month
+    if day != '':
+        date += '-' + day + ' '
+    if hour != '':
+        date += hour + ':'
+    if min != '':
+        date += min
+
+    date += '%'
+
+    records = QualityData.query.filter(QualityData.date.like(date))
+    result = quality_data_schema.dump(records)
+    return jsonify(result)
+
+
 
 
 @app.route('/calidadaire/qualitydata/<id>', methods=['PUT'])
