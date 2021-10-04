@@ -479,6 +479,134 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
+  /particles:
+    post:
+      tags:
+        - Particles
+      summary: Registra las partículas en la BD. Session Requerida
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/particleBody'
+        required: true
+      responses:
+        200:
+          description: (ok) La partícula registrarón correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Particles
+      summary: Obtiene las partículas en la BD.
+      responses:
+        200:
+          description: (ok) Lista de las partículas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/particleBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /particle/{idpart}:
+     get:
+       tags:
+         - Particles
+       summary: Obtiene una partícula de la BD.
+       parameters:
+         - name: idpart
+           in: path
+           description: Identificador de la partícula
+           required: true
+           schema:
+             type: integer
+       responses:
+         200:
+           description: (ok) Descripción del registro
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/particleBody'
+         400:
+           $ref: '#/components/responses/BadRequest'
+         404:
+           $ref: '#/components/responses/NotFound'
+         500:
+           $ref: '#/components/responses/ServerError'
+
+     put:
+       tags:
+         - Particles
+       summary: Actualiza una partícula de la BD. Session Requerida
+       parameters:
+         - name: idpart
+           in: path
+           description: Identificador de la partícula
+           required: true
+           schema:
+             type: integer
+       requestBody:
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/particleBody'
+         required: true
+       responses:
+         200:
+           description: (ok) La partícula se actualizó correctamente.
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/particleBody'
+
+         400:
+           $ref: '#/components/responses/BadRequest'
+         404:
+           $ref: '#/components/responses/NotFound'
+         500:
+           $ref: '#/components/responses/ServerError'
+
+     delete:
+       tags:
+         - Particles
+       summary: Elimina una partícula de la BD. Session Requerida
+       parameters:
+         - name: idpart
+           in: path
+           description: Identificador de la partícula
+           required: true
+           schema:
+             type: integer
+       responses:
+         200:
+           description: (ok) La partícula se eliminó correctamente.
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/particleBody'
+
+         400:
+           $ref: '#/components/responses/BadRequest'
+         404:
+           $ref: '#/components/responses/NotFound'
+         500:
+           $ref: '#/components/responses/ServerError'
 
   /qualitydata:
     post:
@@ -683,136 +811,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/qualityBody'
-
-        400:
-          $ref: '#/components/responses/BadRequest'
-        404:
-          $ref: '#/components/responses/NotFound'
-        500:
-          $ref: '#/components/responses/ServerError'
-
-  /particles:
-    post:
-      tags:
-        - Particles
-      summary: Registra las partículas en la BD. Session Requerida
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/particleBody'
-        required: true
-      responses:
-        200:
-          description: (ok) La partícula registrarón correctamente.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/particleBody'
-
-        400:
-          $ref: '#/components/responses/BadRequest'
-        404:
-          $ref: '#/components/responses/NotFound'
-        500:
-          $ref: '#/components/responses/ServerError'
-
-    get:
-      tags:
-        - Particles
-      summary: Obtiene las partículas en la BD.
-      responses:
-        200:
-          description: (ok) Lista de las partículas
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/particleBody'
-
-        400:
-          $ref: '#/components/responses/BadRequest'
-        404:
-          $ref: '#/components/responses/NotFound'
-        500:
-          $ref: '#/components/responses/ServerError'
-
-  /particle/{idpart}:
-    get:
-      tags:
-        - Particles
-      summary: Obtiene una partícula de la BD.
-      parameters:
-        - name: idpart
-          in: path
-          description: Identificador de la partícula
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: (ok) Descripción del registro
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/particleBody'
-
-        400:
-          $ref: '#/components/responses/BadRequest'
-        404:
-          $ref: '#/components/responses/NotFound'
-        500:
-          $ref: '#/components/responses/ServerError'
-
-    put:
-      tags:
-        - Particles
-      summary: Actualiza una partícula de la BD. Session Requerida
-      parameters:
-        - name: idpart
-          in: path
-          description: Identificador de la partícula
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/particleBody'
-        required: true
-      responses:
-        200:
-          description: (ok) La partícula se actualizó correctamente.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/particleBody'
-
-        400:
-          $ref: '#/components/responses/BadRequest'
-        404:
-          $ref: '#/components/responses/NotFound'
-        500:
-          $ref: '#/components/responses/ServerError'
-
-    delete:
-      tags:
-        - Particles
-      summary: Elimina una partícula de la BD. Session Requerida
-      parameters:
-        - name: idpart
-          in: path
-          description: Identificador de la partícula
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: (ok) La partícula se eliminó correctamente.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/particleBody'
 
         400:
           $ref: '#/components/responses/BadRequest'
