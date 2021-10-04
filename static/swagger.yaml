@@ -17,10 +17,10 @@ tags:
    description: Maneja toda la información relacionada con los usuarios.
  - name: Devices
    description: Maneja toda la información relacionada con los dispositivos.
- - name: Quality Data
-   description: Maneja toda la información administrada por los dispositivos calidad del aire.
  - name: Particles
    description: Maneja toda la información relacionada con los tipos de partículas.
+ - name: Quality Data
+   description: Maneja toda la información administrada por los dispositivos calidad del aire.
  - name: Log Quality Data
    description: Maneja toda la información erronea administrada por los dispositivos calidad del aire.
 
