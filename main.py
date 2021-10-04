@@ -155,12 +155,17 @@ particles_schema = ParticleSchema(many=True)  # Esquema para muchas partículas
 # Inserta una nueva partícula en la BD
 @app.route('/calidadaire/particles', methods=['POST'])
 def create_particle():
-    name = request.json['name']
-    new_particle = Particles(name)
-    db.session.add(new_particle)
-    db.session.commit()
+    if 'userid' in session:
+        name = request.json['name']
+        new_particle = Particles(name)
+        db.session.add(new_particle)
+        db.session.commit()
 
-    return particle_schema.jsonify(new_particle)
+        return particle_schema.jsonify(new_particle)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene todas las partícula de la BD
@@ -181,25 +186,30 @@ def get_particle(id):
 # Actualiza una partícula en la BD
 @app.route('/calidadaire/particle/<id>', methods=['PUT'])
 def update_particle(id):
-    particle = Particles.query.get(id)
-
-    name = request.json['name']
-
-    particle.name = name
-
-    db.session.commit()
-    return particle_schema.jsonify(particle)
+    if 'userid' in session:
+        particle = Particles.query.get(id)
+        name = request.json['name']
+        particle.name = name
+        db.session.commit()
+        return particle_schema.jsonify(particle)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Elimina una partícula en la BD
 @app.route('/calidadaire/particle/<id>', methods=['DELETE'])
 def delete_particle(id):
-    particle = Particles.query.get(id)
-
-    db.session.delete(particle)
-    db.session.commit()
-
-    return particle_schema.jsonify(particle)
+    if 'userid' in session:
+        particle = Particles.query.get(id)
+        db.session.delete(particle)
+        db.session.commit()
+        return particle_schema.jsonify(particle)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Users - Creación y/o referenciación de tabla USERS en la BD
@@ -281,9 +291,9 @@ def login_user():
 
     user = User.query.filter_by(id=id).first()
 
-    if user is not None and user.verify_psw(psw):
+    if user is not None and user.verify_psw(psw):  # Verifica que el usuario exista y que la contraseña coincida
         user.psw = ''
-        session['userid'] = user.id
+        session['userid'] = user.id  # Inicia la session
         return user_schema.jsonify(user)
     else:
         response = jsonify({'message': 'Usuario o contraseña invalidos.'})
@@ -294,8 +304,8 @@ def login_user():
 # Cierra la sesión de un usuario en el sistema
 @app.route('/calidadaire/logout', methods=['GET'])
 def log_out():
-    if 'userid' in session:
-        session.pop('userid', None)
+    if 'userid' in session:  # Verifica si hay una sesión iniciada.
+        session.pop('userid', None)  # Finaliza la session
         response = jsonify({'message': 'Ha finalizado sesión correctamente.'})
         response.status_code = 200
         return response
@@ -308,38 +318,56 @@ def log_out():
 # Obtiene todos los usuario de la BD
 @app.route('/calidadaire/users', methods=['GET'])
 def get_users():
-    all_user = User.query.all()
-    result = users_schema.dump(all_user)
-    return jsonify(result)
+    if 'userid' in session:
+        all_user = User.query.all()
+        result = users_schema.dump(all_user)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene un usuario específico filtrado por id de la BD
 @app.route('/calidadaire/users/<id>', methods=['GET'])
 def get_user(id):
-    user = User.query.get(id)
-    user.psw = ''
-    return user_schema.jsonify(user)
+    if 'userid' in session:
+        user = User.query.get(id)
+        user.psw = ''
+        return user_schema.jsonify(user)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Elimina un usuario de la BD
 @app.route('/calidadaire/users/<id>', methods=['DELETE'])
 def delete_user(id):
-    user = User.query.get(id)
-
-    db.session.delete(user)
-    db.session.commit()
-
-    response = jsonify({'message': 'Usuario eliminado exitosamente.'})
-    response.status_code = 200
-    return response
+    if 'userid' in session:
+        user = User.query.get(id)
+        db.session.delete(user)
+        db.session.commit()
+        response = jsonify({'message': 'Usuario eliminado exitosamente.'})
+        response.status_code = 200
+        return response
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene una lista de usuarios filtrados por el tipo de usuario de la BD
 @app.route('/calidadaire/users/selectbytype/<type>', methods=['GET'])
 def get_user_by_type(type):
-    records = User.query.filter_by(type=type)
-    result = users_schema.dump(records)
-    return jsonify(result)
+    if 'userid' in session:
+        records = User.query.filter_by(type=type)
+        result = users_schema.dump(records)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Si se es administrador actualiza los datos de un usuario específico,
@@ -349,30 +377,35 @@ def update_user(id, state):
     user = User.query.get(id)
 
     if state == '0':  # Entra si el usuario es administrador del sistema
-        id = request.json['id']
-        idtype = request.json['idtype']
-        name = request.json['name']
-        email = request.json['email']
-        cel = request.json['cel']
-        type = request.json['type']
-        psw = request.json['psw']
-        device = request.json['device']
-        bdate = arrow.get(request.json['bdate']).format('YYYY-MM-DD')
+        if 'userid' in session:
+            id = request.json['id']
+            idtype = request.json['idtype']
+            name = request.json['name']
+            email = request.json['email']
+            cel = request.json['cel']
+            type = request.json['type']
+            psw = request.json['psw']
+            device = request.json['device']
+            bdate = arrow.get(request.json['bdate']).format('YYYY-MM-DD')
 
-        user.id = id
-        user.idtype = idtype
-        user.name = name
-        user.email = email
-        user.cel = cel
-        user.type = type
-        user.psw = user.generate_psw(psw)
-        user.device = device
-        user.bdate = bdate
+            user.id = id
+            user.idtype = idtype
+            user.name = name
+            user.email = email
+            user.cel = cel
+            user.type = type
+            user.psw = user.generate_psw(psw)
+            user.device = device
+            user.bdate = bdate
 
-        db.session.commit()
-        user.psw = ''
+            db.session.commit()
+            user.psw = ''
 
-        return user_schema.jsonify(user)
+            return user_schema.jsonify(user)
+        else:
+            response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+            response.status_code = 400
+            return response
     if state == '1':  # Entra si es un usuario no administrador
         psw = request.json['psw']
         user.psw = user.generate_psw(psw)
@@ -426,44 +459,61 @@ def create_device():
 # Obtiene los dispositivos de la BD
 @app.route('/calidadaire/device', methods=['GET'])
 def get_devices():
-    all_devices = Devices.query.all()
-    result = devices_schema.dump(all_devices)
-    return jsonify(result)
+    if 'userid' in session:
+        all_devices = Devices.query.all()
+        result = devices_schema.dump(all_devices)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene un dispositivo específico de la BD
 @app.route('/calidadaire/device/<id>', methods=['GET'])
 def get_device(id):
-    particle = Devices.query.get(id)
-    return device_schema.jsonify(particle)
+    if 'userid' in session:
+        particle = Devices.query.get(id)
+        return device_schema.jsonify(particle)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Actualiza los datos de un dispositivo específico en la BD
 @app.route('/calidadaire/device/<id>', methods=['PUT'])
 def update_device(id):
-    device = Devices.query.get(id)
+    if 'userid' in session:
+        device = Devices.query.get(id)
+        name = request.json['name']
+        geo = request.json['geo']
+        altitude = request.json['altitude']
 
-    name = request.json['name']
-    geo = request.json['geo']
-    altitude = request.json['altitude']
+        device.name = name
+        device.geo = geo
+        device.altitude = altitude
 
-    device.name = name
-    device.geo = geo
-    device.altitude = altitude
-
-    db.session.commit()
-    return device_schema.jsonify(device)
+        db.session.commit()
+        return device_schema.jsonify(device)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Elimina un dispositivo en la BD
 @app.route('/calidadaire/device/<id>', methods=['DELETE'])
 def delete_device(id):
-    device = Devices.query.get(id)
-
-    db.session.delete(device)
-    db.session.commit()
-
-    return device_schema.jsonify(device)
+    if 'userid' in session:
+        device = Devices.query.get(id)
+        db.session.delete(device)
+        db.session.commit()
+        return device_schema.jsonify(device)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Quality Data - Creación y/o referenciación de tabla QUALITY_DATA en la BD
@@ -530,101 +580,134 @@ def create_record():
 # Obtiene todos los registros de calidad del aire de la BD
 @app.route('/calidadaire/qualitydata', methods=['GET'])
 def get_records():
-    all_records = QualityData.query.all()
-    result = quality_data_schema.dump(all_records)
-    return jsonify(result)
+    if 'userid' in session:
+        all_records = QualityData.query.all()
+        result = quality_data_schema.dump(all_records)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene un registro específico de calidad del aire de la BD
 @app.route('/calidadaire/qualitydata/<id>', methods=['GET'])
 def get_record(id):
-    record = QualityData.query.get(id)
-    return data_schema.jsonify(record)
+    if 'userid' in session:
+        record = QualityData.query.get(id)
+        return data_schema.jsonify(record)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obiene los registros de calidad del aire filtrados por dispositivo de la BD
 @app.route('/calidadaire/qualitydata/selectbydevice/<device>', methods=['GET'])
 def get_record_by_device(device):
-    records = QualityData.query.filter_by(device=device)
-    result = quality_data_schema.dump(records)
-    return jsonify(result)
+    if 'userid' in session:
+        records = QualityData.query.filter_by(device=device)
+        result = quality_data_schema.dump(records)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obiene los registros de calidad del aire filtrados por usuario de la BD
 @app.route('/calidadaire/qualitydata/selectbyuser/<userid>', methods=['GET'])
 def get_record_by_user(userid):
-    user = User.query.get(userid)
-    records = QualityData.query.filter_by(device=user.device)
-    result = quality_data_schema.dump(records)
-    return jsonify(result)
+    if 'userid' in session:
+        user = User.query.get(userid)
+        records = QualityData.query.filter_by(device=user.device)
+        result = quality_data_schema.dump(records)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obiene los registros de calidad del aire filtrados por fecha (año, mes, día, hora y/o minuto) de la BD
 @app.route('/calidadaire/qualitydata/datefilter', methods=['POST'])
 def get_record_by_date():
-    year = request.json['year']
-    month = request.json['month']
-    day = request.json['day']
-    hour = request.json['hour']
-    min = request.json['min']
+    if 'userid' in session:
+        year = request.json['year']
+        month = request.json['month']
+        day = request.json['day']
+        hour = request.json['hour']
+        min = request.json['min']
 
-    date = ''
-    if year != '':
-        date = year
-    if month != '':
-        date += '-' + month
-    if day != '':
-        date += '-' + day + ' '
-    if hour != '':
-        date += hour + ':'
-    if min != '':
-        date += min
+        date = ''
+        if year != '':
+           date = year
+        if month != '':
+            date += '-' + month
+        if day != '':
+            date += '-' + day + ' '
+        if hour != '':
+            date += hour + ':'
+        if min != '':
+            date += min
 
-    date += '%'
+        date += '%'
 
-    records = QualityData.query.filter(QualityData.date.like(date))
-    result = quality_data_schema.dump(records)
-    return jsonify(result)
+        records = QualityData.query.filter(QualityData.date.like(date))
+        result = quality_data_schema.dump(records)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Actualiza un registro específico de calidad del aire en la BD
 @app.route('/calidadaire/qualitydata/<id>', methods=['PUT'])
 def update_record(id):
-    record = QualityData.query.get(id)
+    if 'userid' in session:
+        record = QualityData.query.get(id)
 
-    device = request.json['device']
-    pressure = request.json['pressure']
-    id_particle1 = request.json['id_particle1']
-    value_particle1 = request.json['value_particle1']
-    id_particle2 = request.json['id_particle2']
-    value_particle2 = request.json['value_particle2']
-    temp = request.json['temp']
-    rh = request.json['rh']
-    date = request.json['date']
+        device = request.json['device']
+        pressure = request.json['pressure']
+        id_particle1 = request.json['id_particle1']
+        value_particle1 = request.json['value_particle1']
+        id_particle2 = request.json['id_particle2']
+        value_particle2 = request.json['value_particle2']
+        temp = request.json['temp']
+        rh = request.json['rh']
+        date = request.json['date']
 
-    record.device = device
-    record.pressure = pressure
-    record.id_particle1 = id_particle1
-    record.value_particle1 = value_particle1
-    record.id_particle2 = id_particle2
-    record.value_particle2 = value_particle2
-    record.temp = temp
-    record.rh = rh
-    record.date = date
+        record.device = device
+        record.pressure = pressure
+        record.id_particle1 = id_particle1
+        record.value_particle1 = value_particle1
+        record.id_particle2 = id_particle2
+        record.value_particle2 = value_particle2
+        record.temp = temp
+        record.rh = rh
+        record.date = date
 
-    db.session.commit()
-    return data_schema.jsonify(record)
+        db.session.commit()
+        return data_schema.jsonify(record)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Elimina un registro de calidad del aire en la BD
 @app.route('/calidadaire/qualitydata/<id>', methods=['DELETE'])
 def delete_record(id):
-    record = QualityData.query.get(id)
-
-    db.session.delete(record)
-    db.session.commit()
-
-    return data_schema.jsonify(record)
+    if 'userid' in session:
+        record = QualityData.query.get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return data_schema.jsonify(record)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Log Quality Data - Creación y/o referenciación de tabla LOG_QUALITY_DATA en la BD
@@ -696,64 +779,87 @@ def create_log_record():
 # Obtiene los registros log de calidad del aire de la BD
 @app.route('/calidadaire/logqualitydata', methods=['GET'])
 def get_log_records():
-    all_logrecords = LogQualityData.query.all()
-    result = log_quality_data_schema.dump(all_logrecords)
-    return jsonify(result)
+    if 'userid' in session:
+        all_logrecords = LogQualityData.query.all()
+        result = log_quality_data_schema.dump(all_logrecords)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene un registro log específico de calidad del aire de la BD
 @app.route('/calidadaire/logqualitydata/<id>', methods=['GET'])
 def get_log_record(id):
-    logrecord = LogQualityData.query.get(id)
-    return log_data_schema.jsonify(logrecord)
+    if 'userid' in session:
+        logrecord = LogQualityData.query.get(id)
+        return log_data_schema.jsonify(logrecord)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Obtiene un registro log específico de calidad del aire filtrado por dispositivo de la BD
 @app.route('/calidadaire/logqualitydata/selectbydevice/<device>', methods=['GET'])
 def get_log_record_by_device(device):
-    records = LogQualityData.query.filter_by(device=device)
-    result = log_quality_data_schema.dump(records)
-    return jsonify(result)
+    if 'userid' in session:
+        records = LogQualityData.query.filter_by(device=device)
+        result = log_quality_data_schema.dump(records)
+        return jsonify(result)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Actualiza un registro log de calidad del aire en la BD
 @app.route('/calidadaire/logqualitydata/<id>', methods=['PUT'])
 def update_log_record(id):
-    logrecord = LogQualityData.query.get(id)
+    if 'userid' in session:
+        logrecord = LogQualityData.query.get(id)
 
-    device = request.json['device']
-    pressure = request.json['pressure']
-    id_particle1 = request.json['id_particle1']
-    value_particle1 = request.json['value_particle1']
-    id_particle2 = request.json['id_particle2']
-    value_particle2 = request.json['value_particle2']
-    temp = request.json['temp']
-    rh = request.json['rh']
-    date = request.json['date']
+        device = request.json['device']
+        pressure = request.json['pressure']
+        id_particle1 = request.json['id_particle1']
+        value_particle1 = request.json['value_particle1']
+        id_particle2 = request.json['id_particle2']
+        value_particle2 = request.json['value_particle2']
+        temp = request.json['temp']
+        rh = request.json['rh']
+        date = request.json['date']
 
-    logrecord.device = device
-    logrecord.pressure = pressure
-    logrecord.id_particle1 = id_particle1
-    logrecord.value_particle1 = value_particle1
-    logrecord.id_particle2 = id_particle2
-    logrecord.value_particle2 = value_particle2
-    logrecord.temp = temp
-    logrecord.rh = rh
-    logrecord.date = date
+        logrecord.device = device
+        logrecord.pressure = pressure
+        logrecord.id_particle1 = id_particle1
+        logrecord.value_particle1 = value_particle1
+        logrecord.id_particle2 = id_particle2
+        logrecord.value_particle2 = value_particle2
+        logrecord.temp = temp
+        logrecord.rh = rh
+        logrecord.date = date
 
-    db.session.commit()
-    return log_data_schema.jsonify(logrecord)
+        db.session.commit()
+        return log_data_schema.jsonify(logrecord)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Elimina un registro log de calidad del aire en la BD
 @app.route('/calidadaire/logqualitydata/<id>', methods=['DELETE'])
 def delete_log_record(id):
-    logrecord = LogQualityData.query.get(id)
-
-    db.session.delete(logrecord)
-    db.session.commit()
-
-    return log_data_schema.jsonify(logrecord)
+    if 'userid' in session:
+        logrecord = LogQualityData.query.get(id)
+        db.session.delete(logrecord)
+        db.session.commit()
+        return log_data_schema.jsonify(logrecord)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
 
 
 # Método main que inicia el sistema

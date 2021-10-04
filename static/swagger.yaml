@@ -213,7 +213,7 @@ paths:
     get:
       tags:
         - Users
-      summary: Obtiene los usuarios de la BD.
+      summary: Obtiene los usuarios de la BD. Session Requerida
       responses:
         200:
           description: (ok) Lista de todos los tipos de documento
@@ -234,7 +234,7 @@ paths:
     get:
       tags:
         - Users
-      summary: Obtiene un usuario filtrado por id de la BD.
+      summary: Obtiene un usuario filtrado por id de la BD. Session Requerida
       parameters:
         - name: iduser
           in: path
@@ -260,7 +260,7 @@ paths:
     delete:
       tags:
         - Users
-      summary: Elimina un usuario en la BD.
+      summary: Elimina un usuario en la BD. Session Requerida
       parameters:
         - name: iduser
           in: path
@@ -297,7 +297,7 @@ paths:
             type: string
         - name: state
           in: path
-          description: state del update - 0 si es cambio de datos desde el administrador - 1 si es cambio de contraseña desde cada usuario.
+          description: state del update - 0 si es cambio de datos desde el administrador. Session Requerida - 1 si es cambio de contraseña desde cada usuario.
           required: true
           schema:
             type: string
@@ -326,7 +326,7 @@ paths:
     get:
       tags:
         - Users
-      summary: Obtiene los usuarios filtrados por tipo de usuario de la BD.
+      summary: Obtiene los usuarios filtrados por tipo de usuario de la BD. Session Requerida
       parameters:
         - name: type
           in: path
@@ -378,7 +378,7 @@ paths:
     get:
       tags:
         - Devices
-      summary: Obtiene los dispositivos de la BD.
+      summary: Obtiene los dispositivos de la BD. Session Requerida
       responses:
         200:
           description: (ok) Lista de todos los dispositivos
@@ -398,7 +398,7 @@ paths:
     get:
       tags:
         - Devices
-      summary: Obtiene un dispositivo de la BD.
+      summary: Obtiene un dispositivo de la BD. Session Requerida
       parameters:
         - name: iddevice
           in: path
@@ -424,7 +424,7 @@ paths:
     put:
       tags:
         - Devices
-      summary: Actualiza un dispositivo en la BD.
+      summary: Actualiza un dispositivo en la BD. Session Requerida
       parameters:
         - name: iddevice
           in: path
@@ -456,7 +456,7 @@ paths:
     delete:
       tags:
         - Devices
-      summary: Elimina un dispositivo en la BD.
+      summary: Elimina un dispositivo en la BD. Session Requerida
       parameters:
         - name: iddevice
           in: path
@@ -509,7 +509,7 @@ paths:
     get:
       tags:
         - Quality Data
-      summary: Obtiene los datos brindados por los dispositivos calidad del aire en la BD.
+      summary: Obtiene los datos brindados por los dispositivos calidad del aire en la BD. Session Requerida
       responses:
         200:
           description: (ok) Lista de toda la información brindada por los dispositivos.
@@ -529,7 +529,7 @@ paths:
     get:
       tags:
         - Quality Data
-      summary: Obtiene un registro de los datos capturados por los dispositivos de la BD.
+      summary: Obtiene un registro de los datos capturados por los dispositivos de la BD. Session Requerida
       parameters:
         - name: iddata
           in: path
@@ -555,7 +555,7 @@ paths:
     put:
       tags:
         - Quality Data
-      summary: Actualiza un registro de los datos capturados por los dispositivos de la BD.
+      summary: Actualiza un registro de los datos capturados por los dispositivos de la BD. Session Requerida
       parameters:
         - name: iddata
           in: path
@@ -587,7 +587,7 @@ paths:
     delete:
       tags:
         - Quality Data
-      summary: Elimina un registro de los datos capturados por los dispositivos de la BD.
+      summary: Elimina un registro de los datos capturados por los dispositivos de la BD. Session Requerida
       parameters:
         - name: iddata
           in: path
@@ -615,7 +615,7 @@ paths:
     get:
       tags:
         - Quality Data
-      summary: Obtiene los registros de calidad de aire asociados a un dispositivo especifico de la BD.
+      summary: Obtiene los registros de calidad de aire asociados a un dispositivo especifico de la BD. Session Requerida
       parameters:
         - name: iddevice
           in: path
@@ -642,7 +642,7 @@ paths:
     get:
       tags:
         - Quality Data
-      summary: Obtiene los registros de calidad de aire asociados a un usuario especifico de la BD.
+      summary: Obtiene los registros de calidad de aire asociados a un usuario especifico de la BD. Session Requerida
       parameters:
         - name: userid
           in: path
@@ -669,7 +669,7 @@ paths:
     post:
       tags:
         - Quality Data
-      summary: Obtiene los registros de calidad de aire asociados a una fecha especifica de la BD.
+      summary: Obtiene los registros de calidad de aire asociados a una fecha especifica de la BD. Session Requerida
       requestBody:
         content:
           application/json:
@@ -695,7 +695,7 @@ paths:
     post:
       tags:
         - Particles
-      summary: Registra las partículas en la BD.
+      summary: Registra las partículas en la BD. Session Requerida
       requestBody:
         content:
           application/json:
@@ -766,7 +766,7 @@ paths:
     put:
       tags:
         - Particles
-      summary: Actualiza una partícula de la BD.
+      summary: Actualiza una partícula de la BD. Session Requerida
       parameters:
         - name: idpart
           in: path
@@ -798,7 +798,7 @@ paths:
     delete:
       tags:
         - Particles
-      summary: Elimina una partícula de la BD.
+      summary: Elimina una partícula de la BD. Session Requerida
       parameters:
         - name: idpart
           in: path
@@ -850,7 +850,7 @@ paths:
     get:
       tags:
         - Log Quality Data
-      summary: Obtiene los datos erroneos brindados por los dispositivos calidad del aire en la BD.
+      summary: Obtiene los datos erroneos brindados por los dispositivos calidad del aire en la BD. Session Requerida
       responses:
         200:
           description: (ok) Lista de toda la información brindada por los dispositivos.
@@ -870,7 +870,7 @@ paths:
      get:
        tags:
          - Log Quality Data
-       summary: Obtiene un registro erroneos de los datos capturados por los dispositivos de la BD.
+       summary: Obtiene un registro erroneos de los datos capturados por los dispositivos de la BD. Session Requerida
        parameters:
          - name: iddata
            in: path
@@ -895,7 +895,7 @@ paths:
      put:
         tags:
           - Log Quality Data
-        summary: Actualiza un registro erroneos de los datos capturados por los dispositivos de la BD.
+        summary: Actualiza un registro erroneos de los datos capturados por los dispositivos de la BD. Session Requerida
         parameters:
           - name: iddata
             in: path
@@ -927,7 +927,7 @@ paths:
      delete:
         tags:
           - Log Quality Data
-        summary: Elimina un registro erroneos de los datos capturados por los dispositivos de la BD.
+        summary: Elimina un registro erroneos de los datos capturados por los dispositivos de la BD. Session Requerida
         parameters:
           - name: iddata
             in: path
@@ -954,7 +954,7 @@ paths:
     get:
       tags:
         - Log Quality Data
-      summary: Obtiene los registros de log calidad de aire asociados a un dispositivo especifico de la BD.
+      summary: Obtiene los registros de log calidad de aire asociados a un dispositivo especifico de la BD. Session Requerida
       parameters:
         - name: iddevice
           in: path
