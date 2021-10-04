@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 app = Flask('__flask__')
-# Configuración para la conexión a la base de datos
+# Configuración para la conexión a la base de datos (BD)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 PORT = 5000
@@ -19,7 +19,7 @@ app.secret_key = '5HnNaFgcBVNxkUswJ74eImPJQuXSvecr'
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-#
+# Url que redirecciona a archivo swagger
 SWAGGER_URL = '/documentation'
 app_URL = '/static/swagger.yaml'
 swaggerui_blueprint = get_swaggerui_blueprint(
@@ -32,10 +32,11 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 
-# User Types
+# User Types - Creación y/o referenciación de tabla USER_TYPES en la BD
 class UserTypes(db.Model):
     __tablename__ = 'USER_TYPES'
 
+    # Columnas de la tabla USER_TYPES en la BD
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20), nullable=False)
 
@@ -48,13 +49,16 @@ class UserTypesSchema(ma.Schema):
         fields = ('id', 'name')
 
 
-usertype_schema = UserTypesSchema()
-usertypes_schema = UserTypesSchema(many=True)
+usertype_schema = UserTypesSchema()  # Esquema para un tipo de usuario
+usertypes_schema = UserTypesSchema(many=True)  # Esquema para muchos tipos de usuario
 
 
+# USER_TYPES API's
+
+# Inserta un nuevo tipo de usuario en la BD
 @app.route('/calidadaire/usertypes', methods=['POST'])
 def create_usertypes():
-    if 'userid' in session:
+    if 'userid' in session:  # Verifica si hay una sesión iniciada.
         name = request.json['name']
         new_usertype = UserTypes(name)
         db.session.add(new_usertype)
@@ -66,6 +70,7 @@ def create_usertypes():
         return response
 
 
+# Obtiene todos los tipos de usuario de la BD
 @app.route('/calidadaire/usertypes', methods=['GET'])
 def get_usertypes():
     all_usertypes = UserTypes.query.all()
@@ -73,16 +78,18 @@ def get_usertypes():
     return jsonify(result)
 
 
+# Obtiene un tipo de usuario específico de la BD
 @app.route('/calidadaire/usertypes/<id>', methods=['GET'])
 def get_usertype(id):
     usertype = UserTypes.query.get(id)
     return usertype_schema.jsonify(usertype)
 
 
-# Document Types
+# Document Types - Creación y/o referenciación de tabla DOC_TYPES en la BD
 class DocTypes(db.Model):
     __tablename__ = 'DOC_TYPES'
 
+    # Columnas de la tabla DOC_TYPES en la BD
     id = db.Column(db.String(3), primary_key=True)
     name = db.Column(db.String(10), nullable=False)
 
@@ -96,10 +103,13 @@ class DocTypesSchema(ma.Schema):
         fields = ('id', 'name')
 
 
-doctype_schema = DocTypesSchema()
-doctypes_schema = DocTypesSchema(many=True)
+doctype_schema = DocTypesSchema()  # Esquema para un tipo de documento
+doctypes_schema = DocTypesSchema(many=True)  # Esquema para muchs tipos de documento
 
 
+# DOC_TYPES API's
+
+# Inserta tipos de documentos en la BD
 @app.route('/calidadaire/doctypes', methods=['POST'])
 def create_doctypes():
     id = request.json['id']
@@ -111,6 +121,7 @@ def create_doctypes():
     return usertype_schema.jsonify(new_doctype)
 
 
+# Obtiene los tipos de documento de la BD
 @app.route('/calidadaire/doctypes', methods=['GET'])
 def get_doctypes():
     all_usertypes = DocTypes.query.all()
@@ -118,10 +129,11 @@ def get_doctypes():
     return jsonify(result)
 
 
-# Particles API 's
+# Particles - Creación y/o referenciación de tabla PARTICLES en la BD
 class Particles(db.Model):
     __tablename__ = 'PARTICLES'
 
+    # Columnas de la tabla PARTICLES en la BD
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(10), nullable=False)
 
@@ -134,10 +146,13 @@ class ParticleSchema(ma.Schema):
         fields = ('id', 'name')
 
 
-particle_schema = ParticleSchema()
-particles_schema = ParticleSchema(many=True)
+particle_schema = ParticleSchema()  # Esquema para una partícula
+particles_schema = ParticleSchema(many=True)  # Esquema para muchas partículas
 
 
+# PARTICLES API's
+
+# Inserta una nueva partícula en la BD
 @app.route('/calidadaire/particles', methods=['POST'])
 def create_particle():
     name = request.json['name']
@@ -148,6 +163,7 @@ def create_particle():
     return particle_schema.jsonify(new_particle)
 
 
+# Obtiene todas las partícula de la BD
 @app.route('/calidadaire/particles', methods=['GET'])
 def get_particles():
     all_particles = Particles.query.all()
@@ -155,12 +171,14 @@ def get_particles():
     return jsonify(result)
 
 
+# Obtiene una partícula en específico de la BD
 @app.route('/calidadaire/particle/<id>', methods=['GET'])
 def get_particle(id):
     particle = Particles.query.get(id)
     return particle_schema.jsonify(particle)
 
 
+# Actualiza una partícula en la BD
 @app.route('/calidadaire/particle/<id>', methods=['PUT'])
 def update_particle(id):
     particle = Particles.query.get(id)
@@ -173,6 +191,7 @@ def update_particle(id):
     return particle_schema.jsonify(particle)
 
 
+# Elimina una partícula en la BD
 @app.route('/calidadaire/particle/<id>', methods=['DELETE'])
 def delete_particle(id):
     particle = Particles.query.get(id)
@@ -183,11 +202,11 @@ def delete_particle(id):
     return particle_schema.jsonify(particle)
 
 
-# Users API 's
-
+# Users - Creación y/o referenciación de tabla USERS en la BD
 class User(db.Model):
     __tablename__ = 'USERS'
 
+    # Columnas de la tabla USERS en la BD
     id = db.Column(db.String(10), primary_key=True)
     idtype = db.Column(db.String(3), nullable=False)
     name = db.Column(db.String(50), nullable=False)
@@ -211,9 +230,11 @@ class User(db.Model):
         self.bdate = bdate
         self.edate = edate
 
+    # Método para verificar el psw de un usuario a la hora de iniciar sesión
     def verify_psw(self, psw):
         return check_password_hash(self.psw, psw)
 
+    # Método para generar el hash sha256 del psw del usuario antes de registrarlo en la BD
     def generate_psw(self, psw):
         return generate_password_hash(psw)
 
@@ -223,10 +244,13 @@ class UserSchema(ma.Schema):
         fields = ('id', 'idtype', 'name', 'email', 'cel', 'type', 'psw', 'device', 'bdate', 'edate')
 
 
-user_schema = UserSchema()
-users_schema = UserSchema(many=True)
+user_schema = UserSchema()  # Esquema para un usuario
+users_schema = UserSchema(many=True)  # Esquema para muchos usuarios
 
 
+# USERS API's
+
+# Inserta un nuevo usuario en la BD
 @app.route('/calidadaire/signup', methods=['POST'])
 def create_user():
     today = date.today()
@@ -249,6 +273,7 @@ def create_user():
     return user_schema.jsonify(new_user)
 
 
+# Inicia sesión de un usuario en el sistema
 @app.route('/calidadaire/login', methods=['POST'])
 def login_user():
     id = request.json['id']
@@ -266,6 +291,7 @@ def login_user():
         return response
 
 
+# Cierra la sesión de un usuario en el sistema
 @app.route('/calidadaire/logout', methods=['GET'])
 def log_out():
     if 'userid' in session:
@@ -279,6 +305,7 @@ def log_out():
         return response
 
 
+# Obtiene todos los usuario de la BD
 @app.route('/calidadaire/users', methods=['GET'])
 def get_users():
     all_user = User.query.all()
@@ -286,6 +313,7 @@ def get_users():
     return jsonify(result)
 
 
+# Obtiene un usuario específico filtrado por id de la BD
 @app.route('/calidadaire/users/<id>', methods=['GET'])
 def get_user(id):
     user = User.query.get(id)
@@ -293,6 +321,7 @@ def get_user(id):
     return user_schema.jsonify(user)
 
 
+# Elimina un usuario de la BD
 @app.route('/calidadaire/users/<id>', methods=['DELETE'])
 def delete_user(id):
     user = User.query.get(id)
@@ -305,18 +334,21 @@ def delete_user(id):
     return response
 
 
-@app.route('/calidadaire/users/selectbydevice/<type>', methods=['GET'])
+# Obtiene una lista de usuarios filtrados por el tipo de usuario de la BD
+@app.route('/calidadaire/users/selectbytype/<type>', methods=['GET'])
 def get_user_by_type(type):
     records = User.query.filter_by(type=type)
     result = users_schema.dump(records)
     return jsonify(result)
 
 
+# Si se es administrador actualiza los datos de un usuario específico,
+# Si es otro tipo de usuario actualiza su contraseña.
 @app.route('/calidadaire/users/<id>/<state>', methods=['PUT'])
 def update_user(id, state):
     user = User.query.get(id)
 
-    if state == '0':
+    if state == '0':  # Entra si el usuario es administrador del sistema
         id = request.json['id']
         idtype = request.json['idtype']
         name = request.json['name']
@@ -341,7 +373,7 @@ def update_user(id, state):
         user.psw = ''
 
         return user_schema.jsonify(user)
-    if state == '1':
+    if state == '1':  # Entra si es un usuario no administrador
         psw = request.json['psw']
         user.psw = user.generate_psw(psw)
         db.session.commit()
@@ -351,10 +383,11 @@ def update_user(id, state):
         return response
 
 
-# Devices API 's
+# Devices - Creación y/o referenciación de tabla DEVICES en la BD
 class Devices(db.Model):
     __tablename__ = 'DEVICES'
 
+    # Columnas de la tabla DEVICES en la BD
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20), nullable=False, unique=True)
     geo = db.Column(db.String(30), nullable=False)
@@ -371,10 +404,13 @@ class DeviceSchema(ma.Schema):
         fields = ('id', 'name', 'geo', 'altitude')
 
 
-device_schema = DeviceSchema()
-devices_schema = DeviceSchema(many=True)
+device_schema = DeviceSchema()  # Esquema para un dispositivo
+devices_schema = DeviceSchema(many=True)  # Esquema para muchos dispositivos
 
 
+# DEVICES API's
+
+# Inserta un dispositivo en la BD
 @app.route('/calidadaire/device', methods=['POST'])
 def create_device():
     name = request.json['name']
@@ -387,6 +423,7 @@ def create_device():
     return device_schema.jsonify(new_device)
 
 
+# Obtiene los dispositivos de la BD
 @app.route('/calidadaire/device', methods=['GET'])
 def get_devices():
     all_devices = Devices.query.all()
@@ -394,12 +431,14 @@ def get_devices():
     return jsonify(result)
 
 
+# Obtiene un dispositivo específico de la BD
 @app.route('/calidadaire/device/<id>', methods=['GET'])
 def get_device(id):
     particle = Devices.query.get(id)
     return device_schema.jsonify(particle)
 
 
+# Actualiza los datos de un dispositivo específico en la BD
 @app.route('/calidadaire/device/<id>', methods=['PUT'])
 def update_device(id):
     device = Devices.query.get(id)
@@ -416,6 +455,7 @@ def update_device(id):
     return device_schema.jsonify(device)
 
 
+# Elimina un dispositivo en la BD
 @app.route('/calidadaire/device/<id>', methods=['DELETE'])
 def delete_device(id):
     device = Devices.query.get(id)
@@ -426,10 +466,11 @@ def delete_device(id):
     return device_schema.jsonify(device)
 
 
-# Quality Data
+# Quality Data - Creación y/o referenciación de tabla QUALITY_DATA en la BD
 class QualityData(db.Model):
     __tablename__ = 'QUALITY_DATA'
 
+    # Columnas de la tabla QUALITY_DATA en la BD
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     device = db.Column(db.Integer, nullable=False)
     pressure = db.Column(db.Integer, nullable=False)
@@ -460,10 +501,13 @@ class QualityDataSchema(ma.Schema):
                   'temp', 'rh', 'date')
 
 
-data_schema = QualityDataSchema()
-quality_data_schema = QualityDataSchema(many=True)
+data_schema = QualityDataSchema()  # Esquema para un registro de calidad del aire
+quality_data_schema = QualityDataSchema(many=True)  # Esquema para muchos registros de calidad del aire
 
 
+# QUALITY_DATA API's
+
+# Inserta registro de calidad del aire en la BD
 @app.route('/calidadaire/qualitydata', methods=['POST'])
 def create_record():
     device = request.json['device']
@@ -483,6 +527,7 @@ def create_record():
     return data_schema.jsonify(new_record)
 
 
+# Obtiene todos los registros de calidad del aire de la BD
 @app.route('/calidadaire/qualitydata', methods=['GET'])
 def get_records():
     all_records = QualityData.query.all()
@@ -490,12 +535,14 @@ def get_records():
     return jsonify(result)
 
 
+# Obtiene un registro específico de calidad del aire de la BD
 @app.route('/calidadaire/qualitydata/<id>', methods=['GET'])
 def get_record(id):
     record = QualityData.query.get(id)
     return data_schema.jsonify(record)
 
 
+# Obiene los registros de calidad del aire filtrados por dispositivo de la BD
 @app.route('/calidadaire/qualitydata/selectbydevice/<device>', methods=['GET'])
 def get_record_by_device(device):
     records = QualityData.query.filter_by(device=device)
@@ -503,6 +550,7 @@ def get_record_by_device(device):
     return jsonify(result)
 
 
+# Obiene los registros de calidad del aire filtrados por usuario de la BD
 @app.route('/calidadaire/qualitydata/selectbyuser/<userid>', methods=['GET'])
 def get_record_by_user(userid):
     user = User.query.get(userid)
@@ -511,6 +559,7 @@ def get_record_by_user(userid):
     return jsonify(result)
 
 
+# Obiene los registros de calidad del aire filtrados por fecha (año, mes, día, hora y/o minuto) de la BD
 @app.route('/calidadaire/qualitydata/datefilter', methods=['POST'])
 def get_record_by_date():
     year = request.json['year']
@@ -538,8 +587,7 @@ def get_record_by_date():
     return jsonify(result)
 
 
-
-
+# Actualiza un registro específico de calidad del aire en la BD
 @app.route('/calidadaire/qualitydata/<id>', methods=['PUT'])
 def update_record(id):
     record = QualityData.query.get(id)
@@ -568,6 +616,7 @@ def update_record(id):
     return data_schema.jsonify(record)
 
 
+# Elimina un registro de calidad del aire en la BD
 @app.route('/calidadaire/qualitydata/<id>', methods=['DELETE'])
 def delete_record(id):
     record = QualityData.query.get(id)
@@ -578,10 +627,11 @@ def delete_record(id):
     return data_schema.jsonify(record)
 
 
-# Log Quality Data
+# Log Quality Data - Creación y/o referenciación de tabla LOG_QUALITY_DATA en la BD
 class LogQualityData(db.Model):
     __tablename__ = 'LOG_QUALITY_DATA'
 
+    # Columnas de la tabla LOG_QUALITY_DATA en la BD
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     device = db.Column(db.Integer, nullable=False)
     pressure = db.Column(db.Integer, nullable=False)
@@ -615,10 +665,13 @@ class LogQualityDataSchema(ma.Schema):
                   'temp', 'rh', 'date')
 
 
-log_data_schema = LogQualityDataSchema()
-log_quality_data_schema = LogQualityDataSchema(many=True)
+log_data_schema = LogQualityDataSchema()  # Esquema de un registro log de calidad del aire
+log_quality_data_schema = LogQualityDataSchema(many=True)  # Esquema de muchos registros log de calidad del aire
 
 
+# LOG_QUALITY_DATA API's
+
+# Inserta un registro log de calidad del aire en la BD
 @app.route('/calidadaire/logqualitydata', methods=['POST'])
 def create_log_record():
     device = request.json['device']
@@ -640,6 +693,7 @@ def create_log_record():
     return log_data_schema.jsonify(new_logrecord)
 
 
+# Obtiene los registros log de calidad del aire de la BD
 @app.route('/calidadaire/logqualitydata', methods=['GET'])
 def get_log_records():
     all_logrecords = LogQualityData.query.all()
@@ -647,12 +701,14 @@ def get_log_records():
     return jsonify(result)
 
 
+# Obtiene un registro log específico de calidad del aire de la BD
 @app.route('/calidadaire/logqualitydata/<id>', methods=['GET'])
 def get_log_record(id):
     logrecord = LogQualityData.query.get(id)
     return log_data_schema.jsonify(logrecord)
 
 
+# Obtiene un registro log específico de calidad del aire filtrado por dispositivo de la BD
 @app.route('/calidadaire/logqualitydata/selectbydevice/<device>', methods=['GET'])
 def get_log_record_by_device(device):
     records = LogQualityData.query.filter_by(device=device)
@@ -660,6 +716,7 @@ def get_log_record_by_device(device):
     return jsonify(result)
 
 
+# Actualiza un registro log de calidad del aire en la BD
 @app.route('/calidadaire/logqualitydata/<id>', methods=['PUT'])
 def update_log_record(id):
     logrecord = LogQualityData.query.get(id)
@@ -688,6 +745,7 @@ def update_log_record(id):
     return log_data_schema.jsonify(logrecord)
 
 
+# Elimina un registro log de calidad del aire en la BD
 @app.route('/calidadaire/logqualitydata/<id>', methods=['DELETE'])
 def delete_log_record(id):
     logrecord = LogQualityData.query.get(id)
@@ -698,5 +756,6 @@ def delete_log_record(id):
     return log_data_schema.jsonify(logrecord)
 
 
+# Método main que inicia el sistema
 if __name__ == '__main__':
     app.run(port=PORT, debug=DEBUG)

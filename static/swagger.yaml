@@ -234,7 +234,7 @@ paths:
     get:
       tags:
         - Users
-      summary: Obtiene un usuario de la BD.
+      summary: Obtiene un usuario filtrado por id de la BD.
       parameters:
         - name: iduser
           in: path
@@ -322,11 +322,11 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
-  /users/selectbydevice/{type}:
+  /users/selectbytype/{type}:
     get:
       tags:
         - Users
-      summary: Obtiene un usuario de la BD.
+      summary: Obtiene los usuarios filtrados por tipo de usuario de la BD.
       parameters:
         - name: type
           in: path
