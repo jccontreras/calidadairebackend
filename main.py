@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash
 
 app = Flask('__flask__')
 # Configuración para la conexión a la base de datos (BD)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1qaw3edr5tg@192.168.1.102:9000/calidadaireDB'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ragnarok000:1qaw3edr5tg@ragnarok000.mysql.pythonanywhere-services.com/ragnarok000$calidadaireueb'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 PORT = 5000
 DEBUG = False
@@ -91,7 +91,7 @@ class DocTypes(db.Model):
 
     # Columnas de la tabla DOC_TYPES en la BD
     id = db.Column(db.String(3), primary_key=True)
-    name = db.Column(db.String(10), nullable=False)
+    name = db.Column(db.String(30), nullable=False)
 
     def __init__(self, id, name):
         self.id = id
@@ -221,12 +221,12 @@ class User(db.Model):
     idtype = db.Column(db.String(3), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    cel = db.Column(db.String, nullable=False)
+    cel = db.Column(db.String(12), nullable=False)
     type = db.Column(db.Integer, nullable=False)
     psw = db.Column(db.String(66), nullable=False)
     device = db.Column(db.Integer, nullable=True)
-    bdate = db.Column(db.String, nullable=False)
-    edate = db.Column(db.String, nullable=False)
+    bdate = db.Column(db.String(20), nullable=False)
+    edate = db.Column(db.String(20), nullable=False)
 
     def __init__(self, id, idtype, name, email, cel, type, psw, device, bdate, edate):
         self.id = id
@@ -739,8 +739,6 @@ class LogQualityData(db.Model):
         self.date = date
 
 
-db.create_all()
-
 
 class LogQualityDataSchema(ma.Schema):
     class Meta:
@@ -864,4 +862,5 @@ def delete_log_record(id):
 
 # Método main que inicia el sistema
 if __name__ == '__main__':
+    db.create_all()
     app.run(port=PORT, debug=DEBUG)
