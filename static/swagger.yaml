@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  description: API's para al proyecto de Calidad del aire realizadas por Natalia Argote y Juan Camilo Contreras Chacon.
-  version: 1.0.0
+  description: Sistema Back-end para al proyecto de Calidad del aire realizadas por Natalia Argote y Juan Camilo Contreras Chacon.
+  version: 2.0
   title: Calidad del aire API's REST Python Flask - UEB
   contact:
     email: jccontreras@unbosque.edu.co
