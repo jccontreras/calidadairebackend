@@ -121,7 +121,6 @@ def create_doctypes():
     new_doctype = DocTypes(id, name)
     db.session.add(new_doctype)
     db.session.commit()
-
     return usertype_schema.jsonify(new_doctype)
 
 
@@ -530,11 +529,11 @@ class QualityData(db.Model):
     pressure = db.Column(db.Integer, nullable=False)
     id_particle1 = db.Column(db.Integer, nullable=False)
     value_particle1 = db.Column(db.Integer, nullable=False)
-    id_particle2 = db.Column(db.Integer, nullable=False, foreign_key='PARTICLES.id')
+    id_particle2 = db.Column(db.Integer, nullable=False)
     value_particle2 = db.Column(db.Integer, nullable=False)
     temp = db.Column(db.Integer, nullable=False)
     rh = db.Column(db.Integer)
-    date = db.Column(db.String, nullable=False, )
+    date = db.Column(db.String, nullable=False)
 
     def __init__(self, device, pressure, id_particle1, value_particle1, id_particle2, value_particle2,
                  temp, rh, date):
