@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -7,14 +7,18 @@ import arrow
 from datetime import date
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask('__flask__')
 # Configuración para la conexión a la base de datos (BD)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ragnarok000:1qaw3edr5tg@ragnarok000.mysql.pythonanywhere-services.com/ragnarok000$calidadaireueb'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-PORT = 5000
-DEBUG = False
-app.secret_key = '5HnNaFgcBVNxkUswJ74eImPJQuXSvecr'
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = (os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'False') == 'True')
+PORT = os.getenv('PORT')
+DEBUG = (os.getenv('DEBUG', 'False') == 'True')
+app.secret_key = os.getenv('API_KEY')
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)

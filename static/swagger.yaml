@@ -13,12 +13,12 @@ tags:
    description: Maneja toda la parametrización relacionada con los Tipos de usuario.
  - name: Document Types
    description: Maneja toda la parametrización relacionada con los Tipos de documentos.
+ - name: Particles
+   description: Maneja toda la información relacionada con los tipos de partículas.
  - name: Users
    description: Maneja toda la información relacionada con los usuarios.
  - name: Devices
    description: Maneja toda la información relacionada con los dispositivos.
- - name: Particles
-   description: Maneja toda la información relacionada con los tipos de partículas.
  - name: Quality Data
    description: Maneja toda la información administrada por los dispositivos calidad del aire.
  - name: Log Quality Data
