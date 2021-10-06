@@ -223,7 +223,7 @@ class User(db.Model):
     email = db.Column(db.String(50), nullable=False)
     cel = db.Column(db.String(12), nullable=False)
     type = db.Column(db.Integer, nullable=False)
-    psw = db.Column(db.String(66), nullable=False)
+    psw = db.Column(db.String(255), nullable=False)
     device = db.Column(db.Integer, nullable=True)
     bdate = db.Column(db.String(20), nullable=False)
     edate = db.Column(db.String(20), nullable=False)
