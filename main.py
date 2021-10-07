@@ -1,3 +1,5 @@
+from distutils.log import debug
+
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -9,6 +11,8 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 import os
 from dotenv import load_dotenv
+from geopy.geocoders import Nominatim
+from geopy.exc import GeopyError
 
 load_dotenv()
 
@@ -427,17 +431,37 @@ class Devices(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20), nullable=False, unique=True)
     geo = db.Column(db.String(30), nullable=False)
+    district = db.Column(db.String(50), nullable=False)
+    city = db.Column(db.String(50), nullable=False)
+    country = db.Column(db.String(50), nullable=False)
     altitude = db.Column(db.Integer)
 
-    def __init__(self, name, geo, altitude):
+    def __init__(self, name, geo, district, city, country, altitude):
         self.name = name
         self.geo = geo
+        self.district = district
+        self.city = city
+        self.country = country
         self.altitude = altitude
+
+    # Obtiene a travez de la librería geopy la dirección exacta usando las coordenadas enviadas por los dispositivos
+    def get_address(self):
+        try:
+            geolist = self.geo.split(', ')
+            lan = geolist[0]
+            lon = geolist[1]
+            geolocator = Nominatim(user_agent="altaruru_testgeopy")
+            scoord = ("%s %s" % (lan, lon))
+            location = geolocator.reverse(scoord)
+            return location.raw
+        except:
+            debug.print_exception()
+            return None
 
 
 class DeviceSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'geo', 'altitude')
+        fields = ('id', 'name', 'geo', 'district', 'city', 'country', 'altitude')
 
 
 device_schema = DeviceSchema()  # Esquema para un dispositivo
@@ -452,7 +476,16 @@ def create_device():
     name = request.json['name']
     geo = request.json['geo']
     altitude = request.json['altitude']
-    new_device = Devices(name, geo, altitude)
+    district = ''
+    city = ''
+    country = ''
+    new_device = Devices(name, geo, district, city, country, altitude)
+    address = new_device.get_address()
+    geoadd = address['address']
+    new_device.district = geoadd['suburb'].split()[1]
+    new_device.city = geoadd['city']
+    new_device.country = geoadd['country']
+
     db.session.add(new_device)
     db.session.commit()
 
@@ -661,8 +694,6 @@ def get_record_by_date():
             date += min
 
         date += '%'
-        print('date: ' + date)
-        print(userid)
         if userid == '':
             records = QualityData.query.filter(QualityData.date.like(date))
             result = quality_data_schema.dump(records)
@@ -670,18 +701,31 @@ def get_record_by_date():
         else:
             user = User.query.get(userid)
             if user is not None:
-                if date == '%':
-                    records = QualityData.query.filter(QualityData.device == user.device)
-                    result = quality_data_schema.dump(records)
-                    return jsonify(result)
-                else:
-                    records = QualityData.query.filter(QualityData.device == user.device, QualityData.date.like(date))
-                    result = quality_data_schema.dump(records)
-                    return jsonify(result)
+                records = QualityData.query.filter(QualityData.device == user.device, QualityData.date.like(date))
+                result = quality_data_schema.dump(records)
+                return jsonify(result)
             else:
                 response = jsonify({'message': 'Usuario no encontrado.'})
                 response.status_code = 400
                 return response
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
+
+
+@app.route('/calidadaire/qualitydata/locationfilter', methods=['POST'])
+def get_records_by_location():
+    if 'userid' in session:
+        country = request.json['country'] + '%'
+        city = request.json['city'] + '%'
+        district = request.json['district'] + '%'
+
+        records = QualityData.query.join(Devices, Devices.id == QualityData.device) \
+            .filter(Devices.country.like(country), Devices.city.like(city), Devices.district.like(district))
+
+        result = quality_data_schema.dump(records)
+        return jsonify(result)
     else:
         response = jsonify({'message': 'Debe tener su sesión iniciada.'})
         response.status_code = 400
