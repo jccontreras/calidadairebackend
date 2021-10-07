@@ -19,7 +19,7 @@ load_dotenv()
 
 app = Flask('__flask__')
 # Configuración para la conexión a la base de datos (BD)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI_LOCAL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = (os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'False') == 'True')
 PORT = os.getenv('PORT')
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
@@ -547,6 +547,22 @@ def delete_device(id):
         db.session.delete(device)
         db.session.commit()
         return device_schema.jsonify(device)
+    else:
+        response = jsonify({'message': 'Debe tener su sesión iniciada.'})
+        response.status_code = 400
+        return response
+
+
+@app.route('/calidadaire/device/locationfilter', methods=['POST'])
+def get_devices_by_location():
+    if 'userid' in session:
+        country = request.json['country'] + '%'
+        city = request.json['city'] + '%'
+        district = request.json['district'] + '%'
+
+        records = Devices.query.filter(Devices.country.like(country), Devices.city.like(city), Devices.district.like(district))
+        result = devices_schema.dump(records)
+        return jsonify(result)
     else:
         response = jsonify({'message': 'Debe tener su sesión iniciada.'})
         response.status_code = 400
