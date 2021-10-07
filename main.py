@@ -12,7 +12,7 @@ from werkzeug.security import check_password_hash
 import os
 from dotenv import load_dotenv
 from geopy.geocoders import Nominatim
-from geopy.exc import GeopyError
+
 
 load_dotenv()
 
