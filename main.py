@@ -14,8 +14,8 @@ load_dotenv()
 
 app = Flask('__flask__')
 # Configuración para la conexión a la base de datos (BD)
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = (os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'False') == 'True')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI_LOCAL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = (os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'False') == 'True')
 PORT = os.getenv('PORT')
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 app.secret_key = os.getenv('API_KEY')
@@ -623,9 +623,14 @@ def get_record_by_device(device):
 def get_record_by_user(userid):
     if 'userid' in session:
         user = User.query.get(userid)
-        records = QualityData.query.filter_by(device=user.device)
-        result = quality_data_schema.dump(records)
-        return jsonify(result)
+        if user is not None:
+            records = QualityData.query.filter_by(device=user.device)
+            result = quality_data_schema.dump(records)
+            return jsonify(result)
+        else:
+            response = jsonify({'message': 'Usuario no encontrado.'})
+            response.status_code = 400
+            return response
     else:
         response = jsonify({'message': 'Debe tener su sesión iniciada.'})
         response.status_code = 400
@@ -633,9 +638,10 @@ def get_record_by_user(userid):
 
 
 # Obiene los registros de calidad del aire filtrados por fecha (año, mes, día, hora y/o minuto) de la BD
-@app.route('/calidadaire/qualitydata/datefilter', methods=['POST'])
+@app.route('/calidadaire/qualitydata/datefilter/', methods=['POST'])
 def get_record_by_date():
     if 'userid' in session:
+        userid = request.json['userid']
         year = request.json['year']
         month = request.json['month']
         day = request.json['day']
@@ -644,7 +650,7 @@ def get_record_by_date():
 
         date = ''
         if year != '':
-           date = year
+            date = year
         if month != '':
             date += '-' + month
         if day != '':
@@ -655,10 +661,27 @@ def get_record_by_date():
             date += min
 
         date += '%'
-
-        records = QualityData.query.filter(QualityData.date.like(date))
-        result = quality_data_schema.dump(records)
-        return jsonify(result)
+        print('date: ' + date)
+        print(userid)
+        if userid == '':
+            records = QualityData.query.filter(QualityData.date.like(date))
+            result = quality_data_schema.dump(records)
+            return jsonify(result)
+        else:
+            user = User.query.get(userid)
+            if user is not None:
+                if date == '%':
+                    records = QualityData.query.filter(QualityData.device == user.device)
+                    result = quality_data_schema.dump(records)
+                    return jsonify(result)
+                else:
+                    records = QualityData.query.filter(QualityData.device == user.device, QualityData.date.like(date))
+                    result = quality_data_schema.dump(records)
+                    return jsonify(result)
+            else:
+                response = jsonify({'message': 'Usuario no encontrado.'})
+                response.status_code = 400
+                return response
     else:
         response = jsonify({'message': 'Debe tener su sesión iniciada.'})
         response.status_code = 400
@@ -740,7 +763,6 @@ class LogQualityData(db.Model):
         self.temp = temp
         self.rh = rh
         self.date = date
-
 
 
 class LogQualityDataSchema(ma.Schema):

@@ -1075,6 +1075,8 @@ components:
     filterDateBody:
       type: object
       properties:
+        userid:
+          type: string
         year:
           type: string
         month:
