@@ -19,7 +19,7 @@ load_dotenv()
 
 app = Flask('__flask__')
 # Configuración para la conexión a la base de datos (BD)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI_LOCAL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = (os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'False') == 'True')
 PORT = os.getenv('PORT')
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
