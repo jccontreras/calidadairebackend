@@ -553,6 +553,7 @@ def delete_device(id):
         return response
 
 
+# Filtra los dispositivos por país, ciudad y/o localidad de la BD.
 @app.route('/calidadaire/device/locationfilter', methods=['POST'])
 def get_devices_by_location():
     if 'userid' in session:
@@ -731,6 +732,7 @@ def get_record_by_date():
         return response
 
 
+# Filtra los registros de calidad del aire por país, ciudad y/o localidad de la BD.
 @app.route('/calidadaire/qualitydata/locationfilter', methods=['POST'])
 def get_records_by_location():
     if 'userid' in session:
@@ -946,6 +948,7 @@ def delete_log_record(id):
         return response
 
 
+# Trae lista de paisas pre-cargada.
 @app.route('/calidadaire/countries', methods=['GET'])
 def get_contries():
     with open('static/countries.json') as file:
@@ -953,6 +956,7 @@ def get_contries():
         return jsonify(data)
 
 
+# Trae lista de ciudades pre-cargada.
 @app.route('/calidadaire/cities', methods=['GET'])
 def get_cities():
     with open('static/cities.json') as file:
@@ -960,6 +964,7 @@ def get_cities():
         return jsonify(data)
 
 
+# Trae lista de localidades pre-cargada.
 @app.route('/calidadaire/subs', methods=['GET'])
 def get_subs():
     with open('static/subs.json') as file:
