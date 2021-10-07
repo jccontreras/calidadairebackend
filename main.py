@@ -1,3 +1,4 @@
+import json
 from distutils.log import debug
 
 from flask import Flask, request, jsonify
@@ -927,6 +928,27 @@ def delete_log_record(id):
         response = jsonify({'message': 'Debe tener su sesión iniciada.'})
         response.status_code = 400
         return response
+
+
+@app.route('/calidadaire/countries', methods=['GET'])
+def get_contries():
+    with open('static/countries.json') as file:
+        data = json.load(file)
+        return jsonify(data)
+
+
+@app.route('/calidadaire/cities', methods=['GET'])
+def get_cities():
+    with open('static/cities.json') as file:
+        data = json.load(file)
+        return jsonify(data)
+
+
+@app.route('/calidadaire/subs', methods=['GET'])
+def get_subs():
+    with open('static/subs.json') as file:
+        data = json.load(file)
+        return jsonify(data)
 
 
 # Método main que inicia el sistema

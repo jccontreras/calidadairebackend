@@ -19,6 +19,8 @@ tags:
    description: Maneja toda la información relacionada con los usuarios.
  - name: Devices
    description: Maneja toda la información relacionada con los dispositivos.
+ - name: Location
+   description: Trae la información de paises, ciudades y localidades parametrizada.
  - name: Quality Data
    description: Maneja toda la información administrada por los dispositivos calidad del aire.
  - name: Log Quality Data
@@ -471,6 +473,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deviceBodyResponse'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+  /countries:
+    get:
+      tags:
+        - Location
+      summary: Obtiene los paises parametrizados
+      responses:
+        200:
+          description: (ok) Lista de los paises
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locationBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /cities:
+    get:
+      tags:
+        - Location
+      summary: Obtiene las ciudades parametrizados
+      responses:
+        200:
+          description: (ok) Lista de los paises
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locationBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  /subs:
+    get:
+      tags:
+        - Location
+      summary: Obtiene las localidades parametrizados
+      responses:
+        200:
+          description: (ok) Lista de los paises
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locationBody'
 
         400:
           $ref: '#/components/responses/BadRequest'
@@ -1139,4 +1202,10 @@ components:
         city:
           type: string
         district:
+          type: string
+
+    locationBody:
+      type: object
+      properties:
+        name:
           type: string
