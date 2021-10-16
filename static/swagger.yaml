@@ -933,6 +933,26 @@ paths:
         500:
           $ref: '#/components/responses/ServerError'
 
+  /qualitydata/lastday:
+    get:
+      tags:
+        - Quality Data
+      summary: Obtiene los datos de las últimas 24 horas de calidad del aire de la BD.
+      responses:
+        200:
+          description: (ok) Lista de la información de las últimas 24 horas brindada por los dispositivos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lastdayBody'
+
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
   /logqualitydata:
     post:
       tags:
@@ -1116,6 +1136,8 @@ components:
         name:
           type: string
           description: No pueden haber 2 nombres iguales.
+        id:
+          type: integer
         geo:
           type: string
         district:
@@ -1234,3 +1256,36 @@ components:
       properties:
         name:
           type: string
+
+    lastdayBody:
+      type: object
+      properties:
+        device:
+          type: integer
+        pressure:
+          type: integer
+        id_particle1:
+          type: integer
+        value_particle1:
+          type: integer
+        id_particle2:
+          type: integer
+        value_particle2:
+          type: integer
+        temp:
+          type: integer
+        rh:
+          type: integer
+        date:
+          type: string
+          description: En formato YYYY-MM-DD HH mm ss
+        geo:
+          type: string
+        district:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        altitude:
+          type: integer

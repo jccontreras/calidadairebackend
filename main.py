@@ -6,13 +6,12 @@ from flask_marshmallow import Marshmallow
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import session
 import arrow
-from datetime import date
+from datetime import date, timedelta, datetime
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 import os
 from dotenv import load_dotenv
 from geopy.geocoders import Nominatim
-
 
 load_dotenv()
 
@@ -560,7 +559,8 @@ def get_devices_by_location():
         city = request.json['city'] + '%'
         district = request.json['district'] + '%'
 
-        records = Devices.query.filter(Devices.country.like(country), Devices.city.like(city), Devices.district.like(district))
+        records = Devices.query.filter(Devices.country.like(country), Devices.city.like(city),
+                                       Devices.district.like(district))
         result = devices_schema.dump(records)
         return jsonify(result)
     else:
@@ -748,6 +748,33 @@ def get_records_by_location():
         response = jsonify({'message': 'Debe tener su sesión iniciada.'})
         response.status_code = 400
         return response
+
+
+class LastDaySchema(ma.Schema):
+    class Meta:
+         fields = ('id', 'device', 'pressure', 'id_particle1', 'value_particle1', 'id_particle2', 'value_particle2',
+                 'temp', 'rh', 'date', 'name', 'geo', 'district', 'city', 'country', 'altitude')
+
+
+last_day_schema = LastDaySchema(many=True)
+
+
+# Trae las últimas 24 horas de la data de calidad del aire y la ubicación de los mismos
+@app.route('/calidadaire/qualitydata/lastday', methods=['GET'])
+def get_lastday_data():
+    now = datetime.now()
+    one_day_ago = now - timedelta(hours=24)
+
+    records = db.session.query(QualityData.id, QualityData.device
+                               , QualityData.pressure, QualityData.id_particle1, QualityData.value_particle1
+                               , QualityData.id_particle2, QualityData.value_particle2, QualityData.temp
+                               , QualityData.rh, QualityData.date, Devices.geo, Devices.district, Devices.country
+                               , Devices.city, Devices.name, Devices.altitude) \
+        .filter(QualityData.date > one_day_ago).filter(QualityData.date < now) \
+        .filter(Devices.id == QualityData.device).all()
+
+    result = last_day_schema.dump(records)
+    return jsonify(result)
 
 
 # Actualiza un registro específico de calidad del aire en la BD
